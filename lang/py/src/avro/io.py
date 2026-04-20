@@ -94,8 +94,8 @@ class AvroTypeException(schema.AvroException):
   """Raised when datum is not an example of schema."""
   def __init__(self, expected_schema, datum, extra_msg=None):
     pretty_expected = json.dumps(json.loads(str(expected_schema)), indent=2)
-    fail_msg = "The datum %s is not an example of the schema %s"\
-               % (datum, pretty_expected)
+    # remove datum from the error message as it may contain sensitive data
+    fail_msg = "The datum is not an example of the schema %s" % (pretty_expected,)
     if extra_msg:
       fail_msg += '\n\nThe following fields failed to validate:\n' + extra_msg
     schema.AvroException.__init__(self, fail_msg)

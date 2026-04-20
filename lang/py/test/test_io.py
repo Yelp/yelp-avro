@@ -377,6 +377,13 @@ class TestIO(unittest.TestCase):
                   {"name": "E", "type": "int"}]}""")
     datum_to_write = {'E': 5, 'F': 'Bad'}
     self.assertRaises(io.AvroTypeException, write_datum, datum_to_write, writers_schema)
+    self.assertRaisesRegexp(
+      io.AvroTypeException,
+      "The datum is not an example of the schema",
+      write_datum,
+      datum_to_write,
+      writers_schema
+    )
 
 if __name__ == '__main__':
   unittest.main()
