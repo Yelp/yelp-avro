@@ -242,7 +242,7 @@ def validate(expected_schema, datum):
     err_info = []
     for f in expected_schema.fields:
       res = validate(f.type, datum.get(f.name))
-      if not res:
+      if not (res or f.has_default):
         err_info.append('"{0}": {1}'.format(
           f.name,
           res.msg if datum.get(f.name) else 'Required but not found')
@@ -1276,4 +1276,12 @@ class DatumWriter(object):
     Field values are encoded per their schema.
     """
     for field in writers_schema.fields:
-      self.write_data(field.type, datum.get(field.name), encoder)
+      # We explicitly want a KeyError here to differentiate between
+      # missing fields vs None-valued fields
+      try:
+        value = datum[field.name]
+      except KeyError:
+        # TODO: we should be able to skip this field and have the reader fill it in
+        value = field.default
+
+      self.write_data(field.type, value, encoder)
